@@ -37,7 +37,7 @@ func (s *MongoRoomStore) InsertRoom(ctx context.Context, room *types.Room) (*typ
 	room.ID = res.InsertedID.(primitive.ObjectID)
 	// update the hotel room with this id
 	filter := bson.M{
-		"id": room.HotelID,
+		"_id": room.HotelID,
 	}
 	update := bson.M{
 		"$push": bson.M{

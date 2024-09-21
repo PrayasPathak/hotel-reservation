@@ -7,6 +7,14 @@ type Hotel struct {
 	Name     string               `bson:"name" json:"name"`
 	Location string               `bson:"location" json:"location"`
 	Rooms    []primitive.ObjectID `bson:"rooms" json:"rooms"`
+	Rating   int                  `bson:"rating" json:"rating"`
+}
+
+type CreateHotelParams struct {
+	Name     string               `bson:"name" json:"name"`
+	Location string               `bson:"location" json:"location"`
+	Rooms    []primitive.ObjectID `bson:"rooms" json:"rooms"`
+	Rating   int                  `bson:"rating" json:"rating"`
 }
 
 type RoomType int
