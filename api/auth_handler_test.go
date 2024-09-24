@@ -92,20 +92,19 @@ func TestAuthenticateWithWrongPassword(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected http status of 200 but got %d", resp.StatusCode)
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Fatalf("expected http status of 400 but got %d", resp.StatusCode)
 	}
-	var authResp AuthResponse
-	if err := json.NewDecoder(resp.Body).Decode(&authResp); err != nil {
+
+	var genericResp genericResp
+	if err := json.NewDecoder(resp.Body).Decode(&genericResp); err != nil {
 		t.Fatal(err)
 	}
 
-	if authResp.Token == "" {
-		t.Fatal("expected the JWT token to be present in the auth response")
+	if genericResp.Type != "error" {
+		t.Fatalf("expected generic response type be error, but got %s", genericResp.Type)
 	}
-	if !reflect.DeepEqual(insertedUser, authResp.User) {
-		fmt.Println(insertedUser)
-		fmt.Println(authResp.User)
-		t.Fatal("expected the user to be the inserted user")
+	if genericResp.Message != "invalid credentials" {
+		t.Fatalf("expected generic response message to be <invalid credentials>, but got %s", genericResp.Type)
 	}
 }
