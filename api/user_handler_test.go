@@ -17,16 +17,18 @@ import (
 )
 
 type testDB struct {
-	db.UserStore
+	UserStore db.UserStore
 }
 
 func setUp(t *testing.T) *testDB {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+	const testDBURI = "mongodb://localhost:27017/hotel_reservation_test"
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(testDBURI))
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Connected to test database:", testDBURI)
 	return &testDB{
-		UserStore: db.NewMongoUserStore(client, db.TESTDBNAME),
+		UserStore: db.NewMongoUserStore(client),
 	}
 }
 
