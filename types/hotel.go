@@ -17,16 +17,6 @@ type CreateHotelParams struct {
 	Rating   int                  `bson:"rating" json:"rating"`
 }
 
-type RoomType int
-
-const (
-	_ RoomType = iota
-	SingleRoomType
-	DoubleRoomType
-	SeaSideRoomType
-	DeluxeRoomType
-)
-
 type Room struct {
 	ID      primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Seaside bool               `bson:"seaside" json:"seaside"`
