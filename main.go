@@ -74,6 +74,7 @@ func main() {
 
 	// Booking Handler
 	apiv1.Get("/booking/:id", bookingHandler.HandleGetBooking)
+	apiv1.Get("/booking/:id/cancel", bookingHandler.HandleCancelBooking)
 
 	// Admin Handler
 	admin.Get("/booking", bookingHandler.HandleGetBookings)
