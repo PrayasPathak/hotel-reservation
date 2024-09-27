@@ -2,7 +2,6 @@ package api
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,41 +9,23 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/PrayasPathak/hotel-reservation/db"
-	"github.com/PrayasPathak/hotel-reservation/types"
+	"github.com/PrayasPathak/hotel-reservation/db/fixtures"
 	"github.com/gofiber/fiber/v2"
 )
-
-func insertTestUser(t *testing.T, userStore db.UserStore) *types.User {
-	user, err := types.NewUserFromParams(types.CreateUserParams{
-		Email:     "ramesh@gmail.com",
-		FirstName: "Ramesh",
-		LastName:  "Sharma",
-		Password:  "sharmaramesh",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = userStore.InsertUser(context.TODO(), user)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return user
-}
 
 func TestAuthenticateSuccess(t *testing.T) {
 	tdb := setUp(t)
 	defer tdb.teardown(t)
-	insertedUser := insertTestUser(t, tdb.UserStore)
+	insertedUser := fixtures.AddUser(tdb.Store, "ramesh", "sharma", false)
 	insertedUser.EncryptedPassword = ""
 	// Set the encrypted password to "", because we do NOT return that in any
 	// JSON response
 	app := fiber.New()
-	authHandler := NewAuthHandler(tdb.UserStore)
+	authHandler := NewAuthHandler(tdb.User)
 	app.Post("/auth", authHandler.HandleAuthenticate)
 	authParams := AuthParams{
-		Email:    "ramesh@gmail.com",
-		Password: "sharmaramesh",
+		Email:    "ramesh@sharma.com",
+		Password: "ramesh_sharma",
 	}
 	b, _ := json.Marshal(authParams)
 	req := httptest.NewRequest(http.MethodPost, "/auth", bytes.NewReader(b))
@@ -74,15 +55,14 @@ func TestAuthenticateSuccess(t *testing.T) {
 func TestAuthenticateWithWrongPassword(t *testing.T) {
 	tdb := setUp(t)
 	defer tdb.teardown(t)
-	insertedUser := insertTestUser(t, tdb.UserStore)
-	insertedUser.EncryptedPassword = ""
+	fixtures.AddUser(tdb.Store, "ramesh", "sharma", false)
 	// Set the encrypted password to "", because we do NOT return that in any
 	// JSON response
 	app := fiber.New()
-	authHandler := NewAuthHandler(tdb.UserStore)
+	authHandler := NewAuthHandler(tdb.User)
 	app.Post("/auth", authHandler.HandleAuthenticate)
 	authParams := AuthParams{
-		Email:    "ramesh@gmail.com",
+		Email:    "ramesh@sharma.com",
 		Password: "sramesh12",
 	}
 	b, _ := json.Marshal(authParams)
