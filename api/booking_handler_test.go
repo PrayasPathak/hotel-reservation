@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/PrayasPathak/hotel-reservation/api/middleware"
 	"github.com/PrayasPathak/hotel-reservation/db/fixtures"
 	"github.com/PrayasPathak/hotel-reservation/types"
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +25,7 @@ func TestAdminGetBookings(t *testing.T) {
 		till           = from.AddDate(0, 0, 7)
 		booking        = fixtures.AddBooking(tdb.Store, rooms.ID, user.ID, from, till)
 		app            = fiber.New()
-		admin          = app.Group("/", middleware.JWTAuthentication(tdb.User), middleware.AdminAuth)
+		admin          = app.Group("/", JWTAuthentication(tdb.User), AdminAuth)
 		bookingHandler = NewBookingHandler(tdb.Store)
 	)
 
@@ -84,7 +83,7 @@ func TestUserGetBooking(t *testing.T) {
 		till           = from.AddDate(0, 0, 7)
 		booking        = fixtures.AddBooking(tdb.Store, rooms.ID, user.ID, from, till)
 		app            = fiber.New()
-		route          = app.Group("/", middleware.JWTAuthentication(tdb.User))
+		route          = app.Group("/", JWTAuthentication(tdb.User))
 		bookingHandler = NewBookingHandler(tdb.Store)
 	)
 
