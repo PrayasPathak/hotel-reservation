@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"log"
-	"net/http"
 
 	"github.com/PrayasPathak/hotel-reservation/api"
 
@@ -15,13 +14,7 @@ import (
 )
 
 var config = fiber.Config{
-	ErrorHandler: func(c *fiber.Ctx, err error) error {
-		if apiError, ok := err.(api.Error); ok {
-			return c.Status(apiError.Code).JSON(apiError)
-		}
-		apiError := api.NewError(http.StatusInternalServerError, err.Error())
-		return c.Status(apiError.Code).JSON(apiError)
-	},
+	ErrorHandler: api.ErrorHandler,
 }
 
 func main() {

@@ -17,14 +17,16 @@ func TestAdminGetBookings(t *testing.T) {
 	tdb := setUp(t)
 	defer tdb.teardown(t)
 	var (
-		adminUser      = fixtures.AddUser(tdb.Store, "admin", "admin", true)
-		user           = fixtures.AddUser(tdb.Store, "ramesh", "sharma", false)
-		hotel          = fixtures.AddHotel(tdb.Store, "bar hotel", "bermuda", 5, nil)
-		rooms          = fixtures.AddRoom(tdb.Store, "large", true, 299.99, hotel.ID)
-		from           = time.Now()
-		till           = from.AddDate(0, 0, 7)
-		booking        = fixtures.AddBooking(tdb.Store, rooms.ID, user.ID, from, till)
-		app            = fiber.New()
+		adminUser = fixtures.AddUser(tdb.Store, "admin", "admin", true)
+		user      = fixtures.AddUser(tdb.Store, "ramesh", "sharma", false)
+		hotel     = fixtures.AddHotel(tdb.Store, "bar hotel", "bermuda", 5, nil)
+		rooms     = fixtures.AddRoom(tdb.Store, "large", true, 299.99, hotel.ID)
+		from      = time.Now()
+		till      = from.AddDate(0, 0, 7)
+		booking   = fixtures.AddBooking(tdb.Store, rooms.ID, user.ID, from, till)
+		app       = fiber.New(fiber.Config{
+			ErrorHandler: ErrorHandler,
+		})
 		admin          = app.Group("/", JWTAuthentication(tdb.User), AdminAuth)
 		bookingHandler = NewBookingHandler(tdb.Store)
 	)
@@ -66,8 +68,8 @@ func TestAdminGetBookings(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if resp.StatusCode == http.StatusOK {
-		t.Fatalf("expected a non 200 status code but got %d", resp.StatusCode)
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("expected status unauthorized but got %d", resp.StatusCode)
 	}
 }
 
