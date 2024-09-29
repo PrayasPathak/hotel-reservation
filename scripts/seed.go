@@ -5,23 +5,32 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/PrayasPathak/hotel-reservation/api"
 	"github.com/PrayasPathak/hotel-reservation/db"
 	"github.com/PrayasPathak/hotel-reservation/db/fixtures"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
-	ctx := context.Background()
-	var err error
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file: ", err)
+	}
+	var (
+		ctx             = context.Background()
+		err             error
+		mongodbEndpoint = os.Getenv("MONGO_DB_URL")
+		dbname          = os.Getenv("MONGO_DB_NAME")
+	)
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongodbEndpoint))
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := client.Database(db.DBNAME).Drop(ctx); err != nil {
+	if err := client.Database(dbname).Drop(ctx); err != nil {
 		log.Fatal(err)
 	}
 	hotelStore := db.NewMongoHotelStore(client)
